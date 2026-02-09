@@ -5,14 +5,9 @@ package genome;
  * 
  * Each node stores:
  * - An interval [start, end] representing a genomic region
- * - The gene name associated with this interval
+ * - The gene name and extended metadata
  * - maxEnd: the maximum endpoint in the subtree rooted at this node
- * (used for efficient pruning during overlap searches)
  * - References to left and right children
- * 
- * Time Complexity for operations:
- * - Access: O(1)
- * - Modification: O(1)
  * 
  * @author DSA-EL Project
  */
@@ -24,45 +19,58 @@ public class IntervalNode {
     /** End position of the genomic interval */
     public int end;
 
-    /**
-     * Maximum end value in the subtree rooted at this node.
-     * This is the key optimization for interval tree queries.
-     * It allows us to prune entire subtrees that cannot contain overlapping
-     * intervals.
-     */
+    /** Maximum end value in the subtree rooted at this node */
     public int maxEnd;
 
     /** Name of the gene (e.g., BRCA1, TP53) */
     public String geneName;
 
-    /** Left child - contains intervals with smaller start positions */
+    /** Chromosome location (e.g., Chr17, Chr8) */
+    public String chromosome;
+
+    /** Gene type (e.g., Protein Coding) */
+    public String type;
+
+    /** Biological function */
+    public String function;
+
+    /** Associated disease */
+    public String diseaseAssociation;
+
+    /** Applications in research/medicine */
+    public String applications;
+
+    /** Left child */
     public IntervalNode left;
 
-    /** Right child - contains intervals with larger start positions */
+    /** Right child */
     public IntervalNode right;
 
     /**
-     * Constructs a new IntervalNode with the given interval and gene name.
-     * 
-     * @param start    Start position of the interval
-     * @param end      End position of the interval
-     * @param geneName Name of the gene
+     * Constructs a new IntervalNode with basic info (for backward compatibility).
      */
     public IntervalNode(int start, int end, String geneName) {
+        this(start, end, geneName, "", "", "", "", "");
+    }
+
+    /**
+     * Constructs a new IntervalNode with full metadata.
+     */
+    public IntervalNode(int start, int end, String geneName, String chromosome,
+            String type, String function, String diseaseAssociation, String applications) {
         this.start = start;
         this.end = end;
         this.geneName = geneName;
-        this.maxEnd = end; // Initially, maxEnd equals the node's own end
+        this.chromosome = chromosome;
+        this.type = type;
+        this.function = function;
+        this.diseaseAssociation = diseaseAssociation;
+        this.applications = applications;
+        this.maxEnd = end;
         this.left = null;
         this.right = null;
     }
 
-    /**
-     * Returns a string representation of this interval.
-     * Format: "GeneName [start, end]"
-     * 
-     * @return Formatted string representation
-     */
     @Override
     public String toString() {
         return geneName + " [" + start + ", " + end + "]";

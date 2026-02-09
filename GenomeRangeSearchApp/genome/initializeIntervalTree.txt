@@ -1,0 +1,57 @@
+    /**
+     * Initialize the Interval Tree with 37-gene dataset.
+     * Includes diverse gene types: Protein Coding, miRNA, lncRNA, Regulatory, Pseudogene, snoRNA
+     */
+    private static void initializeIntervalTree() {
+        intervalTree = new IntervalTree();
+        
+        // Protein Coding genes (Cancer-related)
+        intervalTree.insert(100, 300, "BRCA1", "Chr17", "Protein Coding", "DNA repair", "Breast cancer", "");
+        intervalTree.insert(250, 420, "TP53", "Chr17", "Protein Coding", "Tumor suppressor", "Multiple cancers", "");
+        intervalTree.insert(500, 680, "MYC", "Chr8", "Protein Coding", "Cell cycle regulation", "Leukemia", "");
+        intervalTree.insert(700, 920, "EGFR", "Chr7", "Protein Coding", "Cell signaling", "Lung cancer", "");
+        intervalTree.insert(850, 1020, "KRAS", "Chr12", "Protein Coding", "Signal transduction", "Pancreatic cancer", "");
+        intervalTree.insert(1050, 1220, "PTEN", "Chr10", "Protein Coding", "Tumor suppression", "Glioblastoma", "");
+        intervalTree.insert(1250, 1430, "ALK", "Chr2", "Protein Coding", "Kinase signaling", "Lung cancer", "");
+        intervalTree.insert(1450, 1630, "BRAF", "Chr7", "Protein Coding", "MAPK pathway", "Melanoma", "");
+        intervalTree.insert(1650, 1820, "CDKN2A", "Chr9", "Protein Coding", "Cell cycle inhibition", "Skin cancer", "");
+        intervalTree.insert(1850, 2030, "RB1", "Chr13", "Protein Coding", "Cell cycle control", "Retinoblastoma", "");
+        intervalTree.insert(2050, 2290, "NF1", "Chr17", "Protein Coding", "Signal regulation", "Neurofibromatosis", "");
+        intervalTree.insert(2300, 2550, "APC", "Chr5", "Protein Coding", "Tumor suppression", "Colon cancer", "");
+        intervalTree.insert(2580, 2760, "SMAD4", "Chr18", "Protein Coding", "TGF-beta signaling", "Pancreatic cancer", "");
+        intervalTree.insert(2780, 2990, "PIK3CA", "Chr3", "Protein Coding", "Cell growth regulation", "Breast cancer", "");
+        intervalTree.insert(3020, 3190, "VHL", "Chr3", "Protein Coding", "Hypoxia response", "Kidney cancer", "");
+        
+        // miRNA genes
+        intervalTree.insert(3200, 3250, "MIR21", "Chr17", "miRNA", "Post-transcriptional regulation", "Cancer", "");
+        intervalTree.insert(3270, 3320, "MIR155", "Chr21", "miRNA", "Immune regulation", "Lymphoma", "");
+        intervalTree.insert(3340, 3390, "MIR34A", "Chr1", "miRNA", "Tumor suppression", "Cancer", "");
+        intervalTree.insert(3410, 3460, "MIR10B", "Chr2", "miRNA", "Cell migration", "Breast cancer", "");
+        intervalTree.insert(3480, 3530, "MIR122", "Chr18", "miRNA", "Liver metabolism", "Liver disease", "");
+        
+        // lncRNA genes
+        intervalTree.insert(3550, 3750, "LINC00152", "Chr2", "lncRNA", "Gene regulation", "Gastric cancer", "");
+        intervalTree.insert(3780, 3980, "HOTAIR", "Chr12", "lncRNA", "Chromatin remodeling", "Breast cancer", "");
+        intervalTree.insert(4000, 4200, "MALAT1", "Chr11", "lncRNA", "RNA splicing", "Metastasis", "");
+        intervalTree.insert(4230, 4450, "XIST", "ChrX", "lncRNA", "X-chromosome inactivation", "Epigenetic disorders", "");
+        intervalTree.insert(4480, 4680, "NEAT1", "Chr11", "lncRNA", "Nuclear structure", "Cancer", "");
+        
+        // Regulatory elements
+        intervalTree.insert(4700, 4850, "REG1", "Chr6", "Regulatory", "Transcription regulation", "Metabolic disorder", "");
+        intervalTree.insert(4870, 5020, "REG2", "Chr8", "Regulatory", "Enhancer activity", "None", "");
+        intervalTree.insert(5050, 5200, "REG3", "Chr4", "Regulatory", "Gene expression control", "Immune disorder", "");
+        intervalTree.insert(5220, 5370, "REG4", "Chr10", "Regulatory", "Promoter regulation", "Cancer", "");
+        intervalTree.insert(5400, 5550, "REG5", "Chr14", "Regulatory", "Chromatin accessibility", "None", "");
+        
+        // Pseudogenes
+        intervalTree.insert(5580, 5700, "PSEUD1", "Chr1", "Pseudogene", "Inactive gene copy", "None", "");
+        intervalTree.insert(5720, 5850, "PSEUD2", "Chr5", "Pseudogene", "Gene relic", "None", "");
+        intervalTree.insert(5870, 6000, "PSEUD3", "Chr9", "Pseudogene", "Nonfunctional duplication", "None", "");
+        
+        // snoRNA genes
+        intervalTree.insert(6020, 6100, "SNORD1", "Chr15", "snoRNA", "rRNA modification", "None", "");
+        intervalTree.insert(6120, 6200, "SNORD2", "Chr16", "snoRNA", "RNA processing", "None", "");
+        intervalTree.insert(6220, 6300, "SNORD3", "Chr17", "snoRNA", "Ribosome biogenesis", "None", "");
+        
+        System.out.println("Interval Tree initialized with 37 genes.");
+    }

@@ -1,16 +1,4 @@
 <!DOCTYPE html>
-<!--
-    index.html - Frontend for Genome Range Search Engine
-    
-    This page provides a simple, academic interface for:
-    1. Entering a query start position
-    2. Entering a query end position
-    3. Submitting the search to find overlapping genes
-    
-    The form submits to /search which is handled by GenomeSearchServlet
-    
-    @author DSA-EL Project
--->
 <html lang="en">
 
 <head>
@@ -21,90 +9,613 @@
 </head>
 
 <body>
-    <div class="container">
-        <!-- Header Section -->
-        <header>
+    <!-- Fixed Header -->
+    <header class="dashboard-header">
+        <div class="header-content">
             <h1>🧬 Genome Range Search Engine</h1>
-            <p class="subtitle">Using Interval Trees for Efficient Overlap Queries</p>
-        </header>
+            <p>Efficient genomic interval queries using Interval Tree data structure</p>
+        </div>
+    </header>
 
-        <!-- Main Search Form -->
-        <main>
-            <form action="search" method="GET" class="search-form">
-                <div class="form-group">
-                    <label for="queryStart">Query Start Position</label>
-                    <input type="number" id="queryStart" name="queryStart" placeholder="e.g., 200" required min="0">
+    <!-- Main Dashboard Content -->
+    <div class="dashboard-container">
+
+        <!-- Search Section -->
+        <section class="search-section">
+            <div class="search-card">
+                <h2>Search Genomic Intervals</h2>
+                <form action="search" method="GET" class="search-form">
+                    <div class="input-group">
+                        <div class="form-field">
+                            <label for="queryStart">Query Start Position</label>
+                            <input type="number" id="queryStart" name="queryStart" placeholder="e.g., 200" required
+                                min="0">
+                        </div>
+                        <div class="form-field">
+                            <label for="queryEnd">Query End Position</label>
+                            <input type="number" id="queryEnd" name="queryEnd" placeholder="e.g., 350" required min="0">
+                        </div>
+                        <button type="submit" class="search-btn">
+                            <span>🔍</span> Search
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- Filter Section -->
+        <section class="filter-section">
+            <div class="filter-card">
+                <label for="geneTypeFilter">Filter by Gene Type:</label>
+                <select id="geneTypeFilter" onchange="filterGenes()">
+                    <option value="all">All Types (37 genes)</option>
+                    <option value="protein-coding">Protein Coding (15 genes)</option>
+                    <option value="mirna">miRNA (5 genes)</option>
+                    <option value="lncrna">lncRNA (5 genes)</option>
+                    <option value="regulatory">Regulatory (5 genes)</option>
+                    <option value="pseudogene">Pseudogene (3 genes)</option>
+                    <option value="snorna">snoRNA (4 genes)</option>
+                </select>
+            </div>
+        </section>
+
+        <!-- Dataset Section -->
+        <section class="dataset-section">
+            <div class="section-header">
+                <h2>Genome Dataset</h2>
+                <p class="gene-count">37 genes across 6 types</p>
+            </div>
+
+            <!-- Gene Cards Grid -->
+            <div class="gene-grid">
+                <!-- Protein Coding Genes -->
+                <div class="gene-card">
+                    <div class="gene-header">
+                        <h3>BRCA1</h3>
+                        <span class="gene-type protein-coding">Protein Coding</span>
+                    </div>
+                    <div class="gene-info">
+                        <p class="interval">[100, 300]</p>
+                        <p class="chromosome">Chr17</p>
+                        <p class="function">DNA repair</p>
+                        <p class="disease">Breast cancer</p>
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="queryEnd">Query End Position</label>
-                    <input type="number" id="queryEnd" name="queryEnd" placeholder="e.g., 350" required min="0">
+                <div class="gene-card">
+                    <div class="gene-header">
+                        <h3>TP53</h3>
+                        <span class="gene-type protein-coding">Protein Coding</span>
+                    </div>
+                    <div class="gene-info">
+                        <p class="interval">[250, 420]</p>
+                        <p class="chromosome">Chr17</p>
+                        <p class="function">Tumor suppressor</p>
+                        <p class="disease">Multiple cancers</p>
+                    </div>
                 </div>
 
-                <button type="submit" class="search-button">Search</button>
-            </form>
+                <div class="gene-card">
+                    <div class="gene-header">
+                        <h3>MYC</h3>
+                        <span class="gene-type protein-coding">Protein Coding</span>
+                    </div>
+                    <div class="gene-info">
+                        <p class="interval">[500, 680]</p>
+                        <p class="chromosome">Chr8</p>
+                        <p class="function">Cell cycle regulation</p>
+                        <p class="disease">Leukemia</p>
+                    </div>
+                </div>
 
-            <!-- Dataset Information -->
-            <section class="dataset-info">
-                <h2>Sample Genome Dataset</h2>
-                <p>The Interval Tree is pre-loaded with the following genes:</p>
-                <table class="dataset-table">
-                    <thead>
-                        <tr>
-                            <th>Gene Name</th>
-                            <th>Interval</th>
-                            <th>Description</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>BRCA1</td>
-                            <td>[100, 300]</td>
-                            <td>cancer gene 1</td>
-                        </tr>
-                        <tr>
-                            <td>TP53</td>
-                            <td>[250, 400]</td>
-                            <td>Tumor protein p53</td>
-                        </tr>
-                        <tr>
-                            <td>MYC</td>
-                            <td>[500, 650]</td>
-                            <td>MYC proto-oncogene</td>
-                        </tr>
-                        <tr>
-                            <td>EGFR</td>
-                            <td>[700, 900]</td>
-                            <td>Epidermal growth factor receptor</td>
-                        </tr>
-                        <tr>
-                            <td>KRAS</td>
-                            <td>[850, 1000]</td>
-                            <td>KRAS proto-oncogene</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </section>
+                <div class="gene-card">
+                    <div class="gene-header">
+                        <h3>EGFR</h3>
+                        <span class="gene-type protein-coding">Protein Coding</span>
+                    </div>
+                    <div class="gene-info">
+                        <p class="interval">[700, 920]</p>
+                        <p class="chromosome">Chr7</p>
+                        <p class="function">Cell signaling</p>
+                        <p class="disease">Lung cancer</p>
+                    </div>
+                </div>
 
-            <!-- Algorithm Information -->
-            <section class="algorithm-info">
-                <h2>About Interval Trees</h2>
-                <div class="info-box">
-                    <p><strong>Time Complexity:</strong> O(log n + k)</p>
+                <div class="gene-card">
+                    <div class="gene-header">
+                        <h3>KRAS</h3>
+                        <span class="gene-type protein-coding">Protein Coding</span>
+                    </div>
+                    <div class="gene-info">
+                        <p class="interval">[850, 1020]</p>
+                        <p class="chromosome">Chr12</p>
+                        <p class="function">Signal transduction</p>
+                        <p class="disease">Pancreatic cancer</p>
+                    </div>
+                </div>
+
+                <div class="gene-card">
+                    <div class="gene-header">
+                        <h3>PTEN</h3>
+                        <span class="gene-type protein-coding">Protein Coding</span>
+                    </div>
+                    <div class="gene-info">
+                        <p class="interval">[1050, 1220]</p>
+                        <p class="chromosome">Chr10</p>
+                        <p class="function">Tumor suppression</p>
+                        <p class="disease">Glioblastoma</p>
+                    </div>
+                </div>
+
+                <div class="gene-card">
+                    <div class="gene-header">
+                        <h3>ALK</h3>
+                        <span class="gene-type protein-coding">Protein Coding</span>
+                    </div>
+                    <div class="gene-info">
+                        <p class="interval">[1250, 1430]</p>
+                        <p class="chromosome">Chr2</p>
+                        <p class="function">Kinase signaling</p>
+                        <p class="disease">Lung cancer</p>
+                    </div>
+                </div>
+
+                <div class="gene-card">
+                    <div class="gene-header">
+                        <h3>BRAF</h3>
+                        <span class="gene-type protein-coding">Protein Coding</span>
+                    </div>
+                    <div class="gene-info">
+                        <p class="interval">[1450, 1630]</p>
+                        <p class="chromosome">Chr7</p>
+                        <p class="function">MAPK pathway</p>
+                        <p class="disease">Melanoma</p>
+                    </div>
+                </div>
+
+                <div class="gene-card">
+                    <div class="gene-header">
+                        <h3>CDKN2A</h3>
+                        <span class="gene-type protein-coding">Protein Coding</span>
+                    </div>
+                    <div class="gene-info">
+                        <p class="interval">[1650, 1820]</p>
+                        <p class="chromosome">Chr9</p>
+                        <p class="function">Cell cycle inhibition</p>
+                        <p class="disease">Skin cancer</p>
+                    </div>
+                </div>
+
+                <div class="gene-card">
+                    <div class="gene-header">
+                        <h3>RB1</h3>
+                        <span class="gene-type protein-coding">Protein Coding</span>
+                    </div>
+                    <div class="gene-info">
+                        <p class="interval">[1850, 2030]</p>
+                        <p class="chromosome">Chr13</p>
+                        <p class="function">Cell cycle control</p>
+                        <p class="disease">Retinoblastoma</p>
+                    </div>
+                </div>
+
+                <div class="gene-card">
+                    <div class="gene-header">
+                        <h3>NF1</h3>
+                        <span class="gene-type protein-coding">Protein Coding</span>
+                    </div>
+                    <div class="gene-info">
+                        <p class="interval">[2050, 2290]</p>
+                        <p class="chromosome">Chr17</p>
+                        <p class="function">Signal regulation</p>
+                        <p class="disease">Neurofibromatosis</p>
+                    </div>
+                </div>
+
+                <div class="gene-card">
+                    <div class="gene-header">
+                        <h3>APC</h3>
+                        <span class="gene-type protein-coding">Protein Coding</span>
+                    </div>
+                    <div class="gene-info">
+                        <p class="interval">[2300, 2550]</p>
+                        <p class="chromosome">Chr5</p>
+                        <p class="function">Tumor suppression</p>
+                        <p class="disease">Colon cancer</p>
+                    </div>
+                </div>
+
+                <div class="gene-card">
+                    <div class="gene-header">
+                        <h3>SMAD4</h3>
+                        <span class="gene-type protein-coding">Protein Coding</span>
+                    </div>
+                    <div class="gene-info">
+                        <p class="interval">[2580, 2760]</p>
+                        <p class="chromosome">Chr18</p>
+                        <p class="function">TGF-beta signaling</p>
+                        <p class="disease">Pancreatic cancer</p>
+                    </div>
+                </div>
+
+                <div class="gene-card">
+                    <div class="gene-header">
+                        <h3>PIK3CA</h3>
+                        <span class="gene-type protein-coding">Protein Coding</span>
+                    </div>
+                    <div class="gene-info">
+                        <p class="interval">[2780, 2990]</p>
+                        <p class="chromosome">Chr3</p>
+                        <p class="function">Cell growth regulation</p>
+                        <p class="disease">Breast cancer</p>
+                    </div>
+                </div>
+
+                <div class="gene-card">
+                    <div class="gene-header">
+                        <h3>VHL</h3>
+                        <span class="gene-type protein-coding">Protein Coding</span>
+                    </div>
+                    <div class="gene-info">
+                        <p class="interval">[3020, 3190]</p>
+                        <p class="chromosome">Chr3</p>
+                        <p class="function">Hypoxia response</p>
+                        <p class="disease">Kidney cancer</p>
+                    </div>
+                </div>
+
+                <!-- miRNA Genes -->
+                <div class="gene-card">
+                    <div class="gene-header">
+                        <h3>MIR21</h3>
+                        <span class="gene-type mirna">miRNA</span>
+                    </div>
+                    <div class="gene-info">
+                        <p class="interval">[3200, 3250]</p>
+                        <p class="chromosome">Chr17</p>
+                        <p class="function">Post-transcriptional regulation</p>
+                        <p class="disease">Cancer</p>
+                    </div>
+                </div>
+
+                <div class="gene-card">
+                    <div class="gene-header">
+                        <h3>MIR155</h3>
+                        <span class="gene-type mirna">miRNA</span>
+                    </div>
+                    <div class="gene-info">
+                        <p class="interval">[3270, 3320]</p>
+                        <p class="chromosome">Chr21</p>
+                        <p class="function">Immune regulation</p>
+                        <p class="disease">Lymphoma</p>
+                    </div>
+                </div>
+
+                <div class="gene-card">
+                    <div class="gene-header">
+                        <h3>MIR34A</h3>
+                        <span class="gene-type mirna">miRNA</span>
+                    </div>
+                    <div class="gene-info">
+                        <p class="interval">[3340, 3390]</p>
+                        <p class="chromosome">Chr1</p>
+                        <p class="function">Tumor suppression</p>
+                        <p class="disease">Cancer</p>
+                    </div>
+                </div>
+
+                <div class="gene-card">
+                    <div class="gene-header">
+                        <h3>MIR10B</h3>
+                        <span class="gene-type mirna">miRNA</span>
+                    </div>
+                    <div class="gene-info">
+                        <p class="interval">[3410, 3460]</p>
+                        <p class="chromosome">Chr2</p>
+                        <p class="function">Cell migration</p>
+                        <p class="disease">Breast cancer</p>
+                    </div>
+                </div>
+
+                <div class="gene-card">
+                    <div class="gene-header">
+                        <h3>MIR122</h3>
+                        <span class="gene-type mirna">miRNA</span>
+                    </div>
+                    <div class="gene-info">
+                        <p class="interval">[3480, 3530]</p>
+                        <p class="chromosome">Chr18</p>
+                        <p class="function">Liver metabolism</p>
+                        <p class="disease">Liver disease</p>
+                    </div>
+                </div>
+
+                <!-- lncRNA Genes -->
+                <div class="gene-card">
+                    <div class="gene-header">
+                        <h3>LINC00152</h3>
+                        <span class="gene-type lncrna">lncRNA</span>
+                    </div>
+                    <div class="gene-info">
+                        <p class="interval">[3550, 3750]</p>
+                        <p class="chromosome">Chr2</p>
+                        <p class="function">Gene regulation</p>
+                        <p class="disease">Gastric cancer</p>
+                    </div>
+                </div>
+
+                <div class="gene-card">
+                    <div class="gene-header">
+                        <h3>HOTAIR</h3>
+                        <span class="gene-type lncrna">lncRNA</span>
+                    </div>
+                    <div class="gene-info">
+                        <p class="interval">[3780, 3980]</p>
+                        <p class="chromosome">Chr12</p>
+                        <p class="function">Chromatin remodeling</p>
+                        <p class="disease">Breast cancer</p>
+                    </div>
+                </div>
+
+                <div class="gene-card">
+                    <div class="gene-header">
+                        <h3>MALAT1</h3>
+                        <span class="gene-type lncrna">lncRNA</span>
+                    </div>
+                    <div class="gene-info">
+                        <p class="interval">[4000, 4200]</p>
+                        <p class="chromosome">Chr11</p>
+                        <p class="function">RNA splicing</p>
+                        <p class="disease">Metastasis</p>
+                    </div>
+                </div>
+
+                <div class="gene-card">
+                    <div class="gene-header">
+                        <h3>XIST</h3>
+                        <span class="gene-type lncrna">lncRNA</span>
+                    </div>
+                    <div class="gene-info">
+                        <p class="interval">[4230, 4450]</p>
+                        <p class="chromosome">ChrX</p>
+                        <p class="function">X-chromosome inactivation</p>
+                        <p class="disease">Epigenetic disorders</p>
+                    </div>
+                </div>
+
+                <div class="gene-card">
+                    <div class="gene-header">
+                        <h3>NEAT1</h3>
+                        <span class="gene-type lncrna">lncRNA</span>
+                    </div>
+                    <div class="gene-info">
+                        <p class="interval">[4480, 4680]</p>
+                        <p class="chromosome">Chr11</p>
+                        <p class="function">Nuclear structure</p>
+                        <p class="disease">Cancer</p>
+                    </div>
+                </div>
+
+                <!-- Regulatory Elements -->
+                <div class="gene-card">
+                    <div class="gene-header">
+                        <h3>REG1</h3>
+                        <span class="gene-type regulatory">Regulatory</span>
+                    </div>
+                    <div class="gene-info">
+                        <p class="interval">[4700, 4850]</p>
+                        <p class="chromosome">Chr6</p>
+                        <p class="function">Transcription regulation</p>
+                        <p class="disease">Metabolic disorder</p>
+                    </div>
+                </div>
+
+                <div class="gene-card">
+                    <div class="gene-header">
+                        <h3>REG2</h3>
+                        <span class="gene-type regulatory">Regulatory</span>
+                    </div>
+                    <div class="gene-info">
+                        <p class="interval">[4870, 5020]</p>
+                        <p class="chromosome">Chr8</p>
+                        <p class="function">Enhancer activity</p>
+                        <p class="disease">None</p>
+                    </div>
+                </div>
+
+                <div class="gene-card">
+                    <div class="gene-header">
+                        <h3>REG3</h3>
+                        <span class="gene-type regulatory">Regulatory</span>
+                    </div>
+                    <div class="gene-info">
+                        <p class="interval">[5050, 5200]</p>
+                        <p class="chromosome">Chr4</p>
+                        <p class="function">Gene expression control</p>
+                        <p class="disease">Immune disorder</p>
+                    </div>
+                </div>
+
+                <div class="gene-card">
+                    <div class="gene-header">
+                        <h3>REG4</h3>
+                        <span class="gene-type regulatory">Regulatory</span>
+                    </div>
+                    <div class="gene-info">
+                        <p class="interval">[5220, 5370]</p>
+                        <p class="chromosome">Chr10</p>
+                        <p class="function">Promoter regulation</p>
+                        <p class="disease">Cancer</p>
+                    </div>
+                </div>
+
+                <div class="gene-card">
+                    <div class="gene-header">
+                        <h3>REG5</h3>
+                        <span class="gene-type regulatory">Regulatory</span>
+                    </div>
+                    <div class="gene-info">
+                        <p class="interval">[5400, 5550]</p>
+                        <p class="chromosome">Chr14</p>
+                        <p class="function">Chromatin accessibility</p>
+                        <p class="disease">None</p>
+                    </div>
+                </div>
+
+                <!-- Pseudogenes -->
+                <div class="gene-card">
+                    <div class="gene-header">
+                        <h3>PSEUD1</h3>
+                        <span class="gene-type pseudogene">Pseudogene</span>
+                    </div>
+                    <div class="gene-info">
+                        <p class="interval">[5580, 5700]</p>
+                        <p class="chromosome">Chr1</p>
+                        <p class="function">Inactive gene copy</p>
+                        <p class="disease">None</p>
+                    </div>
+                </div>
+
+                <div class="gene-card">
+                    <div class="gene-header">
+                        <h3>PSEUD2</h3>
+                        <span class="gene-type pseudogene">Pseudogene</span>
+                    </div>
+                    <div class="gene-info">
+                        <p class="interval">[5720, 5850]</p>
+                        <p class="chromosome">Chr5</p>
+                        <p class="function">Gene relic</p>
+                        <p class="disease">None</p>
+                    </div>
+                </div>
+
+                <div class="gene-card">
+                    <div class="gene-header">
+                        <h3>PSEUD3</h3>
+                        <span class="gene-type pseudogene">Pseudogene</span>
+                    </div>
+                    <div class="gene-info">
+                        <p class="interval">[5870, 6000]</p>
+                        <p class="chromosome">Chr9</p>
+                        <p class="function">Nonfunctional duplication</p>
+                        <p class="disease">None</p>
+                    </div>
+                </div>
+
+                <!-- snoRNA Genes -->
+                <div class="gene-card">
+                    <div class="gene-header">
+                        <h3>SNORD1</h3>
+                        <span class="gene-type snorna">snoRNA</span>
+                    </div>
+                    <div class="gene-info">
+                        <p class="interval">[6020, 6100]</p>
+                        <p class="chromosome">Chr15</p>
+                        <p class="function">rRNA modification</p>
+                        <p class="disease">None</p>
+                    </div>
+                </div>
+
+                <div class="gene-card">
+                    <div class="gene-header">
+                        <h3>SNORD2</h3>
+                        <span class="gene-type snorna">snoRNA</span>
+                    </div>
+                    <div class="gene-info">
+                        <p class="interval">[6120, 6200]</p>
+                        <p class="chromosome">Chr16</p>
+                        <p class="function">RNA processing</p>
+                        <p class="disease">None</p>
+                    </div>
+                </div>
+
+                <div class="gene-card">
+                    <div class="gene-header">
+                        <h3>SNORD3</h3>
+                        <span class="gene-type snorna">snoRNA</span>
+                    </div>
+                    <div class="gene-info">
+                        <p class="interval">[6220, 6300]</p>
+                        <p class="chromosome">Chr17</p>
+                        <p class="function">Ribosome biogenesis</p>
+                        <p class="disease">None</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Project Details Section -->
+        <section class="project-details">
+            <h2>About This Project</h2>
+            <div class="details-grid">
+                <div class="detail-card">
+                    <h3>🎯 Algorithm</h3>
+                    <p><strong>Interval Tree</strong> - A specialized binary search tree for efficient interval overlap
+                        queries</p>
+                </div>
+                <div class="detail-card">
+                    <h3>⚡ Time Complexity</h3>
+                    <p><strong>O(log n + k)</strong></p>
                     <ul>
-                        <li><strong>O(log n):</strong> Tree traversal to find overlapping intervals</li>
-                        <li><strong>O(k):</strong> Reporting k overlapping intervals</li>
+                        <li>O(log n): Tree traversal</li>
+                        <li>O(k): Reporting k results</li>
                     </ul>
-                    <p><strong>Space Complexity:</strong> O(n) for storing n intervals</p>
                 </div>
-            </section>
-        </main>
-
-        <!-- Footer -->
-        <footer>
-            <p>Interval Tree Implementation</p>
-        </footer>
+                <div class="detail-card">
+                    <h3>💾 Space Complexity</h3>
+                    <p><strong>O(n)</strong> - Stores n genomic intervals with metadata</p>
+                </div>
+                <div class="detail-card">
+                    <h3>🧬 Gene Types</h3>
+                    <ul>
+                        <li>15 Protein Coding</li>
+                        <li>5 miRNA</li>
+                        <li>5 lncRNA</li>
+                        <li>5 Regulatory</li>
+                        <li>3 Pseudogene</li>
+                        <li>4 snoRNA</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
     </div>
+
+    <!-- Footer -->
+    <footer class="dashboard-footer">
+        <p>Genome Range Search Engine | Interval Tree Implementation | DSA-EL Project</p>
+    </footer>
+
+    <!-- JavaScript for Gene Type Filter -->
+    <script>
+        function filterGenes() {
+            const filterValue = document.getElementById('geneTypeFilter').value;
+            const geneCards = document.querySelectorAll('.gene-card');
+            let visibleCount = 0;
+
+            geneCards.forEach(card => {
+                const geneTypeBadge = card.querySelector('.gene-type');
+
+                if (filterValue === 'all') {
+                    card.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    if (geneTypeBadge && geneTypeBadge.classList.contains(filterValue)) {
+                        card.style.display = 'block';
+                        visibleCount++;
+                    } else {
+                        card.style.display = 'none';
+                    }
+                }
+            });
+
+            // Update gene count display
+            const geneCountElement = document.querySelector('.gene-count');
+            if (geneCountElement) {
+                const filterText = document.getElementById('geneTypeFilter').options[document.getElementById('geneTypeFilter').selectedIndex].text;
+                geneCountElement.textContent = `Showing ${visibleCount} genes - ${filterText}`;
+            }
+        }
+    </script>
 </body>
 
 </html>
