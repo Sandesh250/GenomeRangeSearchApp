@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<!--
+    index.html - Frontend for Genome Range Search Engine
+    
+    This page provides a simple, academic interface for:
+    1. Entering a query start position
+    2. Entering a query end position
+    3. Submitting the search to find overlapping genes
+    
+    The form submits to /search which is handled by GenomeSearchServlet
+    
+    @author DSA-EL Project
+-->
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Genome Range Search Engine</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header Section -->
+        <header>
+            <h1>🧬 Genome Range Search Engine</h1>
+            <p class="subtitle">Using Interval Trees for Efficient Overlap Queries</p>
+        </header>
+
+        <!-- Main Search Form -->
+        <main>
+            <form action="search" method="GET" class="search-form">
+                <div class="form-group">
+                    <label for="queryStart">Query Start Position</label>
+                    <input type="number" id="queryStart" name="queryStart" placeholder="e.g., 200" required min="0">
+                </div>
+
+                <div class="form-group">
+                    <label for="queryEnd">Query End Position</label>
+                    <input type="number" id="queryEnd" name="queryEnd" placeholder="e.g., 350" required min="0">
+                </div>
+
+                <button type="submit" class="search-button">Search</button>
+            </form>
+
+            <!-- Dataset Information -->
+            <section class="dataset-info">
+                <h2>Sample Genome Dataset</h2>
+                <p>The Interval Tree is pre-loaded with the following genes:</p>
+                <table class="dataset-table">
+                    <thead>
+                        <tr>
+                            <th>Gene Name</th>
+                            <th>Interval</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>BRCA1</td>
+                            <td>[100, 300]</td>
+                            <td>cancer gene 1</td>
+                        </tr>
+                        <tr>
+                            <td>TP53</td>
+                            <td>[250, 400]</td>
+                            <td>Tumor protein p53</td>
+                        </tr>
+                        <tr>
+                            <td>MYC</td>
+                            <td>[500, 650]</td>
+                            <td>MYC proto-oncogene</td>
+                        </tr>
+                        <tr>
+                            <td>EGFR</td>
+                            <td>[700, 900]</td>
+                            <td>Epidermal growth factor receptor</td>
+                        </tr>
+                        <tr>
+                            <td>KRAS</td>
+                            <td>[850, 1000]</td>
+                            <td>KRAS proto-oncogene</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- Algorithm Information -->
+            <section class="algorithm-info">
+                <h2>About Interval Trees</h2>
+                <div class="info-box">
+                    <p><strong>Time Complexity:</strong> O(log n + k)</p>
+                    <ul>
+                        <li><strong>O(log n):</strong> Tree traversal to find overlapping intervals</li>
+                        <li><strong>O(k):</strong> Reporting k overlapping intervals</li>
+                    </ul>
+                    <p><strong>Space Complexity:</strong> O(n) for storing n intervals</p>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer>
+            <p>Interval Tree Implementation</p>
+        </footer>
+    </div>
+</body>
+
+</html>
