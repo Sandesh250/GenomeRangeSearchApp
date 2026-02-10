@@ -38,8 +38,11 @@ public class GenomeSearchServer {
                 // Initialize Interval Tree with sample genome data
                 initializeIntervalTree();
 
-                // Create HTTP server on port 8080
-                HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
+                // Get port from environment variable (for Railway/Heroku) or default to 8080
+                int port = Integer.parseInt(System.getenv().getOrDefault("PORT", "8080"));
+
+                // Create HTTP server on dynamic port
+                HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
 
                 // Route handlers
                 server.createContext("/", new StaticFileHandler()); // Serve HTML/CSS
@@ -52,7 +55,7 @@ public class GenomeSearchServer {
                 System.out.println("========================================");
                 System.out.println("  Genome Range Search Engine Started!");
                 System.out.println("========================================");
-                System.out.println("  Open browser: http://localhost:8080");
+                System.out.println("  Server running on port: " + port);
                 System.out.println("  Press Ctrl+C to stop");
                 System.out.println("========================================");
         }
