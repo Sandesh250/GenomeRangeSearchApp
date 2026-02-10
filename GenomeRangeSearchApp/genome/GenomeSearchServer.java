@@ -5,9 +5,12 @@ import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpExchange;
 import java.io.*;
 import java.net.InetSocketAddress;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * GenomeSearchServer - Standalone HTTP Server for Genome Range Search
@@ -41,6 +44,7 @@ public class GenomeSearchServer {
                 // Route handlers
                 server.createContext("/", new StaticFileHandler()); // Serve HTML/CSS
                 server.createContext("/search", new SearchHandler()); // Handle search
+                server.createContext("/addGene", new AddGeneHandler()); // Handle add gene
 
                 server.setExecutor(null); // Use default executor
                 server.start();
@@ -379,6 +383,92 @@ public class GenomeSearchServer {
                         html.append("<a href=\"index.html\" class=\"back-button\">← Try Again</a>");
                         html.append("</div></body></html>");
                         return html.toString();
+                }
+        }
+
+        /**
+         * Handler for /addGene endpoint - Adds new gene to interval tree
+         */
+        static class AddGeneHandler implements HttpHandler {
+                @Override
+                public void handle(HttpExchange exchange) throws IOException {
+                        if ("POST".equals(exchange.getRequestMethod())) {
+                                // Read POST data
+                                InputStream is = exchange.getRequestBody();
+                                String postData = new String(is.readAllBytes(), StandardCharsets.UTF_8);
+
+                                // Parse form data
+                                Map<String, String> params = new HashMap<>();
+                                String[] pairs = postData.split("&");
+                                for (String pair : pairs) {
+                                        String[] keyValue = pair.split("=");
+                                        if (keyValue.length == 2) {
+                                                params.put(
+                                                                java.net.URLDecoder.decode(keyValue[0],
+                                                                                StandardCharsets.UTF_8),
+                                                                java.net.URLDecoder.decode(keyValue[1],
+                                                                                StandardCharsets.UTF_8));
+                                        }
+                                }
+
+                                try {
+                                        // Extract and validate parameters
+                                        String geneName = params.get("geneName");
+                                        int startPos = Integer.parseInt(params.get("startPos"));
+                                        int endPos = Integer.parseInt(params.get("endPos"));
+                                        String chromosome = params.get("chromosome");
+                                        String geneType = params.get("geneType");
+                                        String function = params.get("function");
+                                        String disease = params.get("disease");
+                                        String applications = params.getOrDefault("applications", "");
+
+                                        // Validate
+                                        if (startPos >= endPos) {
+                                                sendJsonResponse(exchange, false,
+                                                                "Start position must be less than end position", null);
+                                                return;
+                                        }
+
+                                        // Add to interval tree
+                                        intervalTree.insert(startPos, endPos, geneName, chromosome, geneType, function,
+                                                        disease, applications);
+
+                                        // Create response JSON with gene data
+                                        String geneJson = String.format(
+                                                        "{\"name\":\"%s\",\"start\":%d,\"end\":%d,\"chromosome\":\"%s\",\"type\":\"%s\",\"function\":\"%s\",\"disease\":\"%s\",\"applications\":\"%s\"}",
+                                                        geneName, startPos, endPos, chromosome, geneType, function,
+                                                        disease, applications);
+
+                                        sendJsonResponse(exchange, true, "Gene added successfully!", geneJson);
+
+                                        System.out.println("Added new gene: " + geneName + " [" + startPos + ", "
+                                                        + endPos + "]");
+
+                                } catch (NumberFormatException e) {
+                                        sendJsonResponse(exchange, false, "Invalid number format for positions", null);
+                                } catch (Exception e) {
+                                        sendJsonResponse(exchange, false, "Error adding gene: " + e.getMessage(), null);
+                                }
+                        } else {
+                                exchange.sendResponseHeaders(405, -1); // Method not allowed
+                        }
+                }
+
+                private void sendJsonResponse(HttpExchange exchange, boolean success, String message, String geneData)
+                                throws IOException {
+                        String json;
+                        if (success && geneData != null) {
+                                json = String.format("{\"success\":true,\"message\":\"%s\",\"gene\":%s}", message,
+                                                geneData);
+                        } else {
+                                json = String.format("{\"success\":false,\"message\":\"%s\"}", message);
+                        }
+
+                        exchange.getResponseHeaders().set("Content-Type", "application/json");
+                        exchange.sendResponseHeaders(200, json.getBytes().length);
+                        OutputStream os = exchange.getResponseBody();
+                        os.write(json.getBytes());
+                        os.close();
                 }
         }
 }

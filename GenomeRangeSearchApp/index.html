@@ -544,6 +544,74 @@
             </div>
         </section>
 
+        <!-- Add New Genome Section -->
+        <section class="add-gene-section">
+            <div class="add-gene-card">
+                <h2>➕ Add New Genome</h2>
+                <p class="section-subtitle">Contribute to the dataset by adding a new gene</p>
+
+                <form id="addGeneForm" onsubmit="addNewGene(event)">
+                    <div class="form-grid">
+                        <div class="form-field">
+                            <label for="geneName">Gene Name *</label>
+                            <input type="text" id="geneName" name="geneName" placeholder="e.g., BRCA2" required>
+                        </div>
+
+                        <div class="form-field">
+                            <label for="chromosome">Chromosome *</label>
+                            <input type="text" id="chromosome" name="chromosome" placeholder="e.g., Chr17" required>
+                        </div>
+
+                        <div class="form-field">
+                            <label for="startPos">Start Position *</label>
+                            <input type="number" id="startPos" name="startPos" placeholder="e.g., 6000" required
+                                min="0">
+                        </div>
+
+                        <div class="form-field">
+                            <label for="endPos">End Position *</label>
+                            <input type="number" id="endPos" name="endPos" placeholder="e.g., 6200" required min="0">
+                        </div>
+
+                        <div class="form-field">
+                            <label for="geneType">Gene Type *</label>
+                            <select id="geneType" name="geneType" required>
+                                <option value="">Select type...</option>
+                                <option value="Protein Coding">Protein Coding</option>
+                                <option value="miRNA">miRNA</option>
+                                <option value="lncRNA">lncRNA</option>
+                                <option value="Regulatory">Regulatory</option>
+                                <option value="Pseudogene">Pseudogene</option>
+                                <option value="snoRNA">snoRNA</option>
+                            </select>
+                        </div>
+
+                        <div class="form-field">
+                            <label for="function">Function *</label>
+                            <input type="text" id="function" name="function" placeholder="e.g., DNA repair" required>
+                        </div>
+
+                        <div class="form-field full-width">
+                            <label for="disease">Disease Association *</label>
+                            <input type="text" id="disease" name="disease" placeholder="e.g., Cancer" required>
+                        </div>
+
+                        <div class="form-field full-width">
+                            <label for="applications">Applications (Optional)</label>
+                            <input type="text" id="applications" name="applications" placeholder="e.g., Drug targeting">
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="submit-btn">Add Gene to Dataset</button>
+                        <button type="reset" class="reset-btn">Clear Form</button>
+                    </div>
+
+                    <div id="formMessage" class="form-message"></div>
+                </form>
+            </div>
+        </section>
+
         <!-- Project Details Section -->
         <section class="project-details">
             <h2>About This Project</h2>
@@ -614,6 +682,97 @@
                 const filterText = document.getElementById('geneTypeFilter').options[document.getElementById('geneTypeFilter').selectedIndex].text;
                 geneCountElement.textContent = `Showing ${visibleCount} genes - ${filterText}`;
             }
+        }
+
+
+        // Add New Gene Function
+        async function addNewGene(event) {
+            event.preventDefault();
+
+            const formData = new FormData(event.target);
+            const messageDiv = document.getElementById('formMessage');
+
+            // Validate start < end
+            const start = parseInt(formData.get('startPos'));
+            const end = parseInt(formData.get('endPos'));
+
+            if (start >= end) {
+                messageDiv.className = 'form-message error';
+                messageDiv.textContent = '❌ Error: Start position must be less than end position';
+                return;
+            }
+
+            // Show loading
+            messageDiv.className = 'form-message info';
+            messageDiv.textContent = '⏳ Adding gene to dataset...';
+
+            try {
+                const response = await fetch('/addGene', {
+                    method: 'POST',
+                    body: new URLSearchParams(formData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    messageDiv.className = 'form-message success';
+                    messageDiv.textContent = '✅ ' + result.message;
+
+                    // Create and add new card dynamically
+                    createGeneCard(result.gene);
+
+                    // Reset form
+                    event.target.reset();
+
+                    // Clear message after 3 seconds
+                    setTimeout(() => {
+                        messageDiv.textContent = '';
+                        messageDiv.className = 'form-message';
+                    }, 3000);
+                } else {
+                    messageDiv.className = 'form-message error';
+                    messageDiv.textContent = '❌ ' + result.message;
+                }
+            } catch (error) {
+                messageDiv.className = 'form-message error';
+                messageDiv.textContent = '❌ Error: Could not add gene. Please try again.';
+            }
+        }
+
+        // Create gene card dynamically
+        function createGeneCard(gene) {
+            const geneGrid = document.querySelector('.gene-grid');
+
+            // Determine type class
+            let typeClass = 'protein-coding';
+            if (gene.type === 'miRNA') typeClass = 'mirna';
+            else if (gene.type === 'lncRNA') typeClass = 'lncrna';
+            else if (gene.type === 'Regulatory') typeClass = 'regulatory';
+            else if (gene.type === 'Pseudogene') typeClass = 'pseudogene';
+            else if (gene.type === 'snoRNA') typeClass = 'snorna';
+
+            const cardHTML = `
+                <div class="gene-card new-card">
+                    <div class="gene-header">
+                        <h3>${gene.name}</h3>
+                        <span class="gene-type ${typeClass}">${gene.type}</span>
+                    </div>
+                    <div class="gene-info">
+                        <p class="interval">[${gene.start}, ${gene.end}]</p>
+                        <p class="chromosome">${gene.chromosome}</p>
+                        <p class="function">${gene.function}</p>
+                        <p class="disease">${gene.disease}</p>
+                    </div>
+                </div>
+            `;
+
+            geneGrid.insertAdjacentHTML('beforeend', cardHTML);
+
+            // Animate new card
+            setTimeout(() => {
+                const newCard = geneGrid.lastElementChild;
+                newCard.classList.remove('new-card');
+            }, 100);
         }
     </script>
 </body>
